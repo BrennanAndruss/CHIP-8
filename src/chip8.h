@@ -9,10 +9,16 @@
 #define NUM_KEYS 16
 #define FONTSET_SIZE 80
 
+#define FONTSET_START_ADDRESS 0x500
+#define START_ADDRESS 0x200
+
 #define SCREEN_WIDTH 64
 #define SCREEN_HEIGHT 32
 
-const uint8_t fontset[FONTSET_SIZE] =
+#define TRUE 1
+#define FALSE 0
+
+static const uint8_t FONTSET[FONTSET_SIZE] =
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
