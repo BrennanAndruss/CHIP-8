@@ -1,11 +1,13 @@
 #include "chip8.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /*
  * Initialize the system to the startup state
  */
-chip8_init(Chip8 *chip8)
+void chip8_init(Chip8 *chip8)
 {
     // Initialize special registers
     chip8->PC = START_ADDRESS;
@@ -38,11 +40,45 @@ chip8_init(Chip8 *chip8)
     memset(chip8->keypad, FALSE, sizeof(chip8->keypad));
 }
 
-chip8_load_rom(Chip8 *chip8, const char *rom_filename)
+void chip8_load_rom(Chip8 *chip8, const char *rom_filename)
 {
-    
+    FILE *rom = fopen(rom_filename, "rb");
+    if (rom == NULL)
+    {
+        perror("Failed to open ROM");
+        exit(EXIT_FAILURE);
+    }
+
+    // Get the size of the ROM
+    fseek(rom, 0, SEEK_END);
+    long rom_size = ftell(rom);
+
+    // Allocate memory for a buffer to hold the ROM
+    uint8_t *rom_buffer = (uint8_t *)malloc(sizeof(uint8_t) * rom_size);
+    if (rom_buffer == NULL)
+    {
+        perror("Failed to allocate memory for ROM");
+        fclose(rom);
+        exit(EXIT_FAILURE);
+    }
+
+    // Go to the beginning of the file and read the ROM into the buffer
+    rewind(rom);
+    size_t bytes_read = fread(rom_buffer, 1, rom_size, rom);
+    if (bytes_read != rom_size)
+    {
+        perror("Failed to read full ROM");
+        free(rom_buffer);
+        fclose(rom);
+        exit(EXIT_FAILURE);
+    }
+    fclose(rom);
+
+    // Copy the ROM to CHIP-8 memory
+    memcpy(&chip8->memory[START_ADDRESS], rom_buffer, rom_size);
+    free(rom_buffer);
 }
 
-chip8_cycle(Chip8 *chip8)
+void chip8_cycle(Chip8 *chip8)
 {
 }
