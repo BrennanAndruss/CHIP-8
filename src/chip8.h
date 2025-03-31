@@ -1,6 +1,7 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
+#include "instructions.h"
 #include <stdint.h>
 
 #define NUM_REGISTERS 16
