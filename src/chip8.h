@@ -1,8 +1,8 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
-#include "instructions.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 #define NUM_REGISTERS 16
 #define TOTAL_RAM 4096
@@ -15,9 +15,6 @@
 
 #define SCREEN_WIDTH 64
 #define SCREEN_HEIGHT 32
-
-#define TRUE 1
-#define FALSE 0
 
 static const uint8_t FONTSET[FONTSET_SIZE] =
     {

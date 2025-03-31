@@ -1,4 +1,5 @@
 #include "chip8.h"
+#include "instructions.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +38,7 @@ void chip8_init(Chip8 *chip8)
     chip8->sound_timer = 0;
 
     // Set up keyboard
-    memset(chip8->keypad, FALSE, sizeof(chip8->keypad));
+    memset(chip8->keypad, false, sizeof(chip8->keypad));
 }
 
 void chip8_load_rom(Chip8 *chip8, const char *rom_filename)

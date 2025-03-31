@@ -12,6 +12,11 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // Set up the window
+    Platform platform;
+    if (!platform_init(&platform))
+        return -1;
+
     Chip8 chip8;
 
     // Initialize the emulator and load ROM into memory
@@ -19,5 +24,14 @@ int main(int argc, char *argv[])
     chip8_load_rom(&chip8, argv[1]);
 
     printf("ROM Loaded\n");
+
+    // Main loop
+    bool running = true;
+    while (running)
+    {
+        SDL_Delay(2);
+    }
+
+    platform_cleanup(&platform);
     return 0;
 }
