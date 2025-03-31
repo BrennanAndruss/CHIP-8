@@ -10,6 +10,9 @@
  */
 void chip8_init(Chip8 *chip8)
 {
+    chip8->is_running = true;
+    chip8->is_paused = false;
+
     // Initialize special registers
     chip8->PC = START_ADDRESS;
     chip8->SP = 0;

@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
     printf("ROM Loaded\n");
 
     // Main loop
-    bool running = true;
-    while (running)
+    while (chip8.is_running)
     {
+        platform_process_input(&chip8);
         SDL_Delay(2);
     }
 

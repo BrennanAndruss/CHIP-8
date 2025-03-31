@@ -52,6 +52,10 @@ struct Chip8_t
 
     uint8_t keypad[NUM_KEYS];
     uint32_t screen[SCREEN_WIDTH * SCREEN_HEIGHT];
+
+    // Execution control flags
+    bool is_running;
+    bool is_paused;
 };
 
 void chip8_init(Chip8 *chip8);
