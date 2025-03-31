@@ -43,7 +43,7 @@ struct Chip8_t
     uint8_t memory[TOTAL_RAM];
     uint16_t stack[STACK_SIZE];
 
-    uint16_t V[NUM_REGISTERS];
+    uint8_t V[NUM_REGISTERS];
     uint16_t I;  // Index register
     uint16_t PC; // Program counter
     uint8_t SP;  // Stack pointer
@@ -52,6 +52,8 @@ struct Chip8_t
 
     uint8_t keypad[NUM_KEYS];
     uint32_t screen[SCREEN_WIDTH * SCREEN_HEIGHT];
+
+    uint16_t current_op;
 
     // Execution control flags
     bool is_running;
