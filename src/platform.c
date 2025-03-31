@@ -1,7 +1,7 @@
 #include "platform.h"
 #include <stdio.h>
 
-bool platform_init(Platform *platform)
+bool platform_init(Platform *platform, int window_width, int window_height)
 {
     // Initialize SDL video and event subsystems
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -12,7 +12,7 @@ bool platform_init(Platform *platform)
 
     platform->window = SDL_CreateWindow(
         "CHIP-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+        window_width, window_height, SDL_WINDOW_SHOWN);
     if (!platform->window)
     {
         printf("Could not create SDL window: %s\n", SDL_GetError());
@@ -36,6 +36,17 @@ bool platform_init(Platform *platform)
     }
 
     return true;
+}
+
+void platform_update(Platform *platform, Chip8 *chip8, int pitch)
+{
+    // Copy pixel buffer to SDL texture
+    SDL_UpdateTexture(platform->texture, NULL, chip8->screen, pitch);
+
+    // Render the texture
+    SDL_RenderClear(platform->renderer);
+    SDL_RenderCopy(platform->renderer, platform->texture, NULL, NULL);
+    SDL_RenderPresent(platform->renderer);
 }
 
 void platform_process_input(Chip8 *chip8)

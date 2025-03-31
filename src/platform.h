@@ -4,9 +4,6 @@
 #include <SDL2/SDL.h>
 #include "chip8.h"
 
-#define WINDOW_HEIGHT 640
-#define WINDOW_WIDTH 1280
-
 static const uint8_t KEYMAP[NUM_KEYS] =
     {
         SDL_SCANCODE_X, // 0
@@ -37,8 +34,8 @@ struct Platform_t
     uint32_t pixels[SCREEN_WIDTH * SCREEN_HEIGHT];
 };
 
-bool platform_init(Platform *platform);
-void platform_update(Platform *platform, const uint8_t screen[SCREEN_WIDTH * SCREEN_HEIGHT]);
+bool platform_init(Platform *platform, int window_width, int window_height);
+void platform_update(Platform *platform, Chip8 *chip8, int pitch);
 void platform_process_input(Chip8 *chip8);
 void platform_cleanup(Platform *platform);
 
