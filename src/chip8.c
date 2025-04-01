@@ -12,6 +12,7 @@ void chip8_init(Chip8 *chip8)
 {
     chip8->is_running = true;
     chip8->is_paused = false;
+    chip8->current_op = 0;
 
     // Initialize special registers
     chip8->PC = START_ADDRESS;
@@ -89,12 +90,13 @@ void chip8_cycle(Chip8 *chip8)
     uint8_t MSB = chip8->memory[chip8->PC];
     uint8_t LSB = chip8->memory[chip8->PC + 1];
     uint16_t opcode = (MSB << 8) | LSB;
+    chip8->current_op = opcode;
 
     // Increment the program counter
-    chip8->PC += 1;
+    chip8->PC += 2;
 
     // Decode and execute the instructions
-    // Filter by the first half-byte
+    // Filter by the first nibble
     switch (opcode & 0xF000)
     {
     case 0x0000:
@@ -219,9 +221,11 @@ void chip8_cycle(Chip8 *chip8)
         {
         case 0x009E:
             // SKP
+            op_0xEX9E(chip8);
             break;
         case 0x00A1:
             // SKNP
+            op_0xEXA1(chip8);
             break;
         default:
             printf("Unrecognized opcode 0x%X\n", opcode);
@@ -234,30 +238,39 @@ void chip8_cycle(Chip8 *chip8)
         {
         case 0x0007:
             // LD Vx, DT
+            op_0xFX07(chip8);
             break;
         case 0x000A:
             // LD Vx, K
+            op_0xFX0A(chip8);
             break;
         case 0x0015:
             // LD DT, Vx
+            op_0xFX15(chip8);
             break;
         case 0x0018:
             // LD ST, Vx
+            op_0xFX18(chip8);
             break;
         case 0x001E:
             // ADD I, Vx
+            op_0xFX1E(chip8);
             break;
         case 0x0029:
             // LD F, Vx
+            op_0xFX29(chip8);
             break;
         case 0x0033:
             // LD B, Vx
+            op_0xFX33(chip8);
             break;
         case 0x0055:
             // LD [I], Vx
+            op_0xFX55(chip8);
             break;
         case 0x0065:
             // LD Vx, [I]
+            op_0xFX65(chip8);
             break;
         default:
             printf("Unrecognized opcode 0x%X\n", opcode);

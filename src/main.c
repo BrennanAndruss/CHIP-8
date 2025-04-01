@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     {
         platform_process_input(&chip8);
 
+        chip8_cycle(&chip8);
         platform_update(&platform, &chip8, pitch);
 
         SDL_Delay(2);
