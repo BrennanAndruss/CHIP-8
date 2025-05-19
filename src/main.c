@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "chip8.h"
 #include "platform.h"
@@ -22,6 +23,9 @@ int main(int argc, char *argv[])
     }
 
     const char *rom_filename = argv[2];
+
+    // Seed the RNG
+    srand(time(NULL));
 
     // Set up the window
     Platform platform;

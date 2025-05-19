@@ -11,8 +11,15 @@ void op_0x00E0(Chip8 *chip8)
     memset(chip8->screen, 0, sizeof(chip8->screen));
 }
 
-// RET
-void op_0x00EE(Chip8 *chip8) {};
+/*
+ * Opcode 00EE: RET
+ * Return from a subroutine.
+ */
+void op_0x00EE(Chip8 *chip8)
+{
+    chip8->SP--;
+    chip8->PC = chip8->stack[chip8->SP];
+}
 
 /*
  * Opcode 1NNN: JP addr
@@ -24,17 +31,59 @@ void op_0x1NNN(Chip8 *chip8)
     chip8->PC = address;
 }
 
-// CALL addr
-void op_0x2NNN(Chip8 *chip8) {};
+/*
+ * Opcode 2NNN: CALL addr
+ * Call subroutine at nnn.
+ */
+void op_0x2NNN(Chip8 *chip8)
+{
+    uint16_t address = chip8->current_op & 0x0FFF;
+    chip8->stack[chip8->SP] = chip8->PC;
+    chip8->SP++;
+    chip8->PC = address;
+}
 
-// SE Vx, byte
-void op_0x3XKK(Chip8 *chip8) {};
+/*
+ * Opcode 3XKK: SE Vx, byte
+ * Skip next instruction if Vx = kk.
+ */
+void op_0x3XKK(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t kk = chip8->current_op & 0x00FF;
+    if (chip8->V[x] == kk)
+    {
+        chip8->PC += 2;
+    }
+}
 
-// SNE Vx, byte
-void op_0x4XKK(Chip8 *chip8) {};
+/*
+ * Opcode 4XKK: SNE Vx, byte
+ * Skip next instruction if Vx != kk.
+ */
+void op_0x4XKK(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t kk = chip8->current_op & 0x00FF;
+    if (chip8->V[x] != kk)
+    {
+        chip8->PC += 2;
+    }
+}
 
-// SE Vx, Vy
-void op_0x5XY0(Chip8 *chip8) {};
+/*
+ * Opcode 5XY0: SE Vx, Vy
+ * Skip next instruction if Vx = Vy.
+ */
+void op_0x5XY0(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
+    if (chip8->V[x] == chip8->V[y])
+    {
+        chip8->PC += 2;
+    }
+}
 
 /*
  * Opcode 6XKK: LD Vx, byte
@@ -49,8 +98,7 @@ void op_0x6XKK(Chip8 *chip8)
 
 /*
  * Opcode 7XKK: ADD Vx, byte
- * Adds the value kk to the value of register Vx,
- * then stores the result in Vx.
+ * Set Vx = Vx + kk.
  */
 void op_0x7XKK(Chip8 *chip8)
 {
@@ -59,37 +107,129 @@ void op_0x7XKK(Chip8 *chip8)
     chip8->V[x] += kk;
 }
 
-// LD Vx, Vy
-void op_0x8XY0(Chip8 *chip8) {};
+/*
+ * Opcode 8XY0: LD Vx, Vy
+ * Set Vx = Vy.
+ */
+void op_0x8XY0(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
+    chip8->V[x] = chip8->V[y];
+}
 
-// OR Vx, Vy
-void op_0x8XY1(Chip8 *chip8) {};
+/*
+ * Opcode 8XY1: OR Vx, Vy
+ * Set Vx = Vx OR Vy.
+ */
+void op_0x8XY1(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
+    chip8->V[x] = chip8->V[x] | chip8->V[y];
+}
 
-// AND Vx, Vy
-void op_0x8XY2(Chip8 *chip8) {};
+/*
+ * Opcode 8XY2: AND Vx, Vy
+ * Set Vx = Vx AND Vy.
+ */
+void op_0x8XY2(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
+    chip8->V[x] = chip8->V[x] | chip8->V[y];
+}
 
-// XOR Vx, Vy
-void op_0x8XY3(Chip8 *chip8) {};
+/*
+ * Opcode 8XY3: XOR Vx, Vy
+ * Set Vx = Vx XOR Vy.
+ */
+void op_0x8XY3(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
+    chip8->V[x] = chip8->V[x] ^ chip8->V[y];
+}
 
-// ADD Vx, Vy
-void op_0x8XY4(Chip8 *chip8) {};
+/*
+ * Opcode 8XY4: ADD Vx, Vy
+ * Set Vx = Vx + Vy, set VF = carry.
+ */
+void op_0x8XY4(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
+    uint16_t sum = chip8->V[x] + chip8->V[y];
 
-// SUB Vx, Vy
-void op_0x8XY5(Chip8 *chip8) {};
+    // Set carry flag and store lowest 8 bits of sum
+    chip8->V[0xF] = sum > 255;
+    chip8->V[x] = sum & 0xFF;
+}
 
-// SHR Vx
-void op_0x8XY6(Chip8 *chip8) {};
+/*
+ * Opcode 0x8XY5: SUB Vx, Vy
+ * Set Vx = Vx - Vy, set VF = NOT borrow.
+ */
+void op_0x8XY5(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
 
-// SUBN Vx, Vy
-void op_0x8XY7(Chip8 *chip8) {};
+    // Set borrow flag and store difference
+    chip8->V[0xF] = chip8->V[x] > chip8->V[y];
+    chip8->V[x] -= chip8->V[y];
+}
 
-// SHL Vx
-void op_0x8XYE(Chip8 *chip8) {};
+/*
+ * Opcode 0x8XY6: SHR Vx
+ * Set Vx = Vx >> 1, set VF = LSb of Vx.
+ */
+void op_0x8XY6(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    chip8->V[0xF] = chip8->V[x] & 1;
+    chip8->V[x] >>= 1;
+}
 
-// SNE Vx, Vy
-void op_0x9XY0(Chip8 *chip8) {};
+/*
+ * Opcode 0x8XY7: SUBN Vx, Vy
+ * Set Vx = Vy - Vx, set VF = NOT borrow.
+ */
+void op_0x8XY7(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
 
-// LD I, addr
+    // Set borrow flag and store difference
+    chip8->V[0xF] = chip8->V[y] > chip8->V[x];
+    chip8->V[x] = chip8->V[y] - chip8->V[x];
+}
+
+/*
+ * Opcode 0x8XYE: SHL Vx
+ * Set Vx = Vx << 1, set VF = MSb of Vx.
+ */
+void op_0x8XYE(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    chip8->V[0xF] = chip8->V[x] & 0x80;
+    chip8->V[x] <<= 1;
+}
+
+/*
+ * Opcode 9XY0: SNE Vx, Vy
+ * Skip next instruction if Vx != Vy.
+ */
+void op_0x9XY0(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t y = (chip8->current_op & 0x00F0) >> 4;
+    if (chip8->V[x] != chip8->V[y])
+    {
+        chip8->PC += 2;
+    }
+};
+
 /*
  * Opcode ANNN: LD I, addr
  * Set the value of register I to nnn.
@@ -100,13 +240,28 @@ void op_0xANNN(Chip8 *chip8)
     chip8->I = nnn;
 }
 
-// JP V0, addr
-void op_0xBNNN(Chip8 *chip8) {};
+/*
+ * Opcode BNNN: JP V0, addr
+ * Jump to location nnn + V0.
+ */
+void op_0xBNNN(Chip8 *chip8)
+{
+    uint16_t address = chip8->current_op & 0x0FFF;
+    chip8->PC = address + chip8->V[0];
+}
 
-// RND Vx, byte
-void op_0xCXKK(Chip8 *chip8) {};
+/*
+ * Opcode CXKK: RND Vx, byte
+ * Set Vx = random byte AND kk.
+ */
+void op_0xCXKK(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t kk = chip8->current_op & 0x00FF;
+    uint8_t random_val = rand() % 256;
+    chip8->V[x] = random_val & kk;
+}
 
-// DRW Vx, Vy, nibble
 /*
  * Opcode DXYN: DRW Vx, Vy, nibble
  * Display n-byte sprite starting at memory location I at (Vx, Vy),
@@ -153,35 +308,147 @@ void op_0xDXYN(Chip8 *chip8)
     }
 }
 
-// SKP Vx
-void op_0xEX9E(Chip8 *chip8) {};
+/*
+ * Opcode EX9E: SKP Vx
+ * Skip next instruction if key with the value of Vx is pressed.
+ */
+void op_0xEX9E(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t key = chip8->V[x];
+    if (chip8->keypad[key])
+    {
+        chip8->PC += 2;
+    }
+}
 
-// SKNP Vx
-void op_0xEXA1(Chip8 *chip8) {};
+/*
+ * Opcode EXA1: SKNP Vx
+ * Skip next instruction if key with the value of Vx is not pressed.
+ */
+void op_0xEXA1(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t key = chip8->V[x];
+    if (!chip8->keypad[key])
+    {
+        chip8->PC += 2;
+    }
+}
 
-// LD Vx, DT
-void op_0xFX07(Chip8 *chip8) {};
+/*
+ * Opcode FX07: LD Vx, DT
+ * Set Vx = delay timer value.
+ */
+void op_0xFX07(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    chip8->V[x] = chip8->delay_timer;
+}
 
-// LD Vx, K
-void op_0xFX0A(Chip8 *chip8) {};
+/*
+ * Opcode FX0A: LD Vx, K
+ * Wait for a key press, store the value of the key in Vx.
+ */
+void op_0xFX0A(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
 
-// LD DT, Vx
-void op_0xFX15(Chip8 *chip8) {};
+    // Check each key for a key input
+    for (int i = 0; i < NUM_KEYS; i++)
+    {
+        if (chip8->keypad[i])
+        {
+            chip8->V[x] = i;
 
-// LD ST, Vx
-void op_0xFX18(Chip8 *chip8) {};
+            // Return to resume program execution
+            return;
+        }
+    }
 
-// ADD I, Vx
-void op_0xFX1E(Chip8 *chip8) {};
+    // Decrement the PC, blocking the instruction
+    chip8->PC -= 2;
+}
 
-// LD F, Vx
-void op_0xFX29(Chip8 *chip8) {};
+/*
+ * Opcode FX15: LD DT, Vx
+ * Set delay timer = Vx.
+ */
+void op_0xFX15(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    chip8->delay_timer = chip8->V[x];
+}
 
-// LD B, Vx
-void op_0xFX33(Chip8 *chip8) {};
+/*
+ * Opcode FX18: LD ST, Vx
+ * Set sound timer = Vx.
+ */
+void op_0xFX18(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    chip8->sound_timer = chip8->V[x];
+}
 
-// LD [I], Vx
-void op_0xFX55(Chip8 *chip8) {};
+/*
+ * Opcode FX1E: ADD I, Vx
+ * Set I = I + Vx.
+ */
+void op_0xFX1E(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    chip8->I += chip8->V[x];
+}
 
-// LD Vx, [I]
-void op_0xFX65(Chip8 *chip8) {};
+/*
+ * Opcode FX29: LD F, Vx
+ * Set I = location of sprite for digit Vx.
+ */
+void op_0xFX29(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    chip8->I = 0x5 * chip8->V[x];
+}
+
+/*
+ * Opcode 0xFX33: LD B, Vx
+ * Store BCD representation of Vx in memory locations I,
+ * I+1, and I+2.
+ */
+void op_0xFX33(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+    uint8_t val = chip8->V[x];
+
+    chip8->memory[chip8->I] = val / 100;
+    chip8->memory[chip8->I + 1] = val / 10 % 10;
+    chip8->memory[chip8->I + 2] = val % 10;
+}
+
+/*
+ * Opcode FX55: LD [I], Vx
+ * Store registers V0 through Vx in memory starting at location I.
+ */
+void op_0xFX55(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+
+    for (int i = 0; i < x; i++)
+    {
+        chip8->memory[chip8->I + i] = chip8->V[i];
+    }
+}
+
+/*
+ * Opcode FX65: LD Vx, [I]
+ * Read registers V0 through Vx from memory starting at location I.
+ */
+void op_0xFX65(Chip8 *chip8)
+{
+    uint8_t x = (chip8->current_op & 0x0F00) >> 8;
+
+    for (int i = 0; i < x; i++)
+    {
+        chip8->V[i] = chip8->memory[chip8->I + i];
+    }
+}
