@@ -1,5 +1,6 @@
 #include "instructions.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 /*
@@ -433,7 +434,7 @@ void op_0xFX55(Chip8 *chip8)
 {
     uint8_t x = (chip8->current_op & 0x0F00) >> 8;
 
-    for (int i = 0; i < x; i++)
+    for (int i = 0; i <= x; i++)
     {
         chip8->memory[chip8->I + i] = chip8->V[i];
     }
@@ -447,7 +448,7 @@ void op_0xFX65(Chip8 *chip8)
 {
     uint8_t x = (chip8->current_op & 0x0F00) >> 8;
 
-    for (int i = 0; i < x; i++)
+    for (int i = 0; i <= x; i++)
     {
         chip8->V[i] = chip8->memory[chip8->I + i];
     }

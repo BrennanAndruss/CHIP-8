@@ -196,6 +196,11 @@ void chip8_cycle(Chip8 *chip8)
         }
         break;
 
+    case 0x9000:
+        // SNE Vx, Vy
+        op_0x9XY0(chip8);
+        break;
+
     case 0xA000:
         // LD I, addr
         op_0xANNN(chip8);
