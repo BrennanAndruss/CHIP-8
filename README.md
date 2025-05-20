@@ -1,4 +1,4 @@
-# CHIP-8 Emulator
+# 🕹️ CHIP-8 Emulator
 
 A CHIP-8 emulator written in C, featuring full instruction decoding, memory and register handling, SDL2-based graphics, and keyboard input mapping. 
 
@@ -64,6 +64,12 @@ make
 ```
 
 ---
+
+## 🔍 What I Learned
+
+- Low level systems programming in C
+- Core concepts in computer architecture and organization applied through emulation
+- Configuring and developing in a Linux environment through WSL and VS Code
 
 ## 📚 Reference
 
